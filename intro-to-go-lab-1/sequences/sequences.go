@@ -10,8 +10,9 @@ func square(a int) int {
 	return a * a
 }
 
-func double(slice []int) {
+func double(slice []int) []int {
 	slice = append(slice, slice...)
+	return slice
 }
 
 func mapSlice(f func(a int) int, slice []int) {
@@ -44,6 +45,12 @@ func main() {
 	fmt.Println(newSlice)
 	mapSlice(square, newSlice)
 	fmt.Println(newSlice)
+	fmt.Println(intsSlice)
+	fmt.Println()
+
+	fmt.Println(intsSlice)
+	intsSlice = double(intsSlice)
+	fmt.Println(intsSlice)
 	fmt.Println()
 
 }
