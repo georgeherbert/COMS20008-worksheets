@@ -20,10 +20,11 @@ func mapSlice(f func(a int) int, slice []int) {
 	}
 }
 
-func mapArray(f func(a int) int, array [3]int) {
+func mapArray(f func(a int) int, array [3]int) [3]int {
 	for i, j := range array {
 		array[i] = f(j)
 	}
+	return array
 }
 
 func main() {
@@ -36,6 +37,6 @@ func main() {
 
 	intsArray := [3]int{1, 2, 3}
 	fmt.Println(intsArray)
-	mapArray(addOne, intsArray)
+	intsArray = mapArray(addOne, intsArray)
 	fmt.Println(intsArray)
 }
