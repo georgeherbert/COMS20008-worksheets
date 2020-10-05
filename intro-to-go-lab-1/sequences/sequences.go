@@ -32,13 +32,18 @@ func main() {
 	fmt.Println(intsSlice)
 	mapSlice(addOne, intsSlice)
 	fmt.Println(intsSlice)
-
 	fmt.Println()
 
 	intsArray := [5]int{1, 2, 3, 4, 5}
 	fmt.Println(intsArray)
 	intsArray = mapArray(addOne, intsArray)
 	fmt.Println(intsArray)
+	fmt.Println()
 
+	newSlice := intsSlice[1:3]
+	fmt.Println(newSlice)
+	mapSlice(square, newSlice)
+	fmt.Println(newSlice)
+	fmt.Println()
 
 }
