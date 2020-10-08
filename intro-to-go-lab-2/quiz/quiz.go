@@ -38,26 +38,38 @@ func questions() []question {
 }
 
 // ask asks a question and returns an updated score depending on the answer.
-func ask(s score, question question) score {
-	fmt.Println(question.q)
+func ask(s chan score, question <-chan question) {
+	currentQuestion := <-question
+	fmt.Println(currentQuestion.q)
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("Enter answer: ")
 	scanner.Scan()
 	text := scanner.Text()
-	if strings.Compare(text, question.a) == 0 {
+	currentScore := <-s
+	if strings.Compare(text, currentQuestion.a) == 0 {
 		fmt.Println("Correct!")
-		s++
+		currentScore++
 	} else {
 		fmt.Println("Incorrect :-(")
 	}
-	return s
+	s <- currentScore
 }
 
 func main() {
-	s := score(0)
-	qs := questions()
-	for _, q := range qs {
-		s = ask(s, q)
+	s := make(chan score)
+	qs := make(chan question)
+
+	go ask(s, qs)
+	qs <- questions()[0]
+	s <- score(0)
+
+	for _, q := range(questions()[1:]) {
+		go ask(s, qs)
+		qs <- q
+		s <- (<- s)
 	}
-	fmt.Println("Final score", s)
+
+	finalScore := <-s
+	fmt.Println("Final score", finalScore)
+
 }
