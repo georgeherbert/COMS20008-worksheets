@@ -10,21 +10,27 @@ import (
 
 func foo(channel chan string) {
 	// TODO: Write an infinite loop of sending "pings" and receiving "pongs"
-	sendMessage := "ping"
-	fmt.Println("Foo is sending:", sendMessage)
-	channel <- sendMessage
+	for i := 0; i >= 0; i++ {
+		sendMessage := "ping"
+		fmt.Println("Foo is sending:", sendMessage)
+		channel <- sendMessage
 
-	recieveMessage := <-channel
-	fmt.Println("Foo has received:", recieveMessage)
+		recieveMessage := <-channel
+		fmt.Println("Foo has received:", recieveMessage)
+
+		fmt.Println("")
+	}
 }
 
 func bar(channel chan string) {
-	receiveMessage := <-channel
-	fmt.Println("Bar has received:", receiveMessage)
+	for i := 0; i >= 0; i++ {
+		receiveMessage := <-channel
+		fmt.Println("Bar has received:", receiveMessage)
 
-	sendMessage:= "pong"
-	fmt.Println("Bar is sending:", sendMessage)
-	channel <- sendMessage
+		sendMessage := "pong"
+		fmt.Println("Bar is sending:", sendMessage)
+		channel <- sendMessage
+	}
 
 	// TODO: Write an infinite loop of receiving "pings" and sending "pongs"
 }
@@ -36,6 +42,7 @@ func pingPong() {
 
 	go foo(pingPongChannel) // Nil is similar to null. Sending or receiving from a nil chan blocks forever.
 	go bar(pingPongChannel)
+
 	time.Sleep(500 * time.Millisecond)
 }
 
