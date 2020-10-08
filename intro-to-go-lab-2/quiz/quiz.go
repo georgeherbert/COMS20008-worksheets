@@ -59,14 +59,16 @@ func main() {
 	s := make(chan score)
 	qs := make(chan question)
 
-	go ask(s, qs)
-	qs <- questions()[0]
-	s <- score(0)
-
-	for _, q := range(questions()[1:]) {
+	scoreInitialised := false
+	for _, q := range(questions()) {
 		go ask(s, qs)
 		qs <- q
-		s <- (<- s)
+		if scoreInitialised {
+			s <- (<-s)
+		} else {
+			s <- score(0)
+			scoreInitialised = true
+		}
 	}
 
 	finalScore := <-s
