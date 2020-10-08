@@ -23,13 +23,13 @@ func sendMessages(receiver chan string) {
 
 func main() {
 	// Create a channel for sending and receiving strings.
-	messages := make(chan string)
+	messages := make(chan string, 3)
 
 	// Start a new goroutine that will send some messages.
 	go sendMessages(messages)
 
 	// Receive the 3 messages sent by the goroutine.
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 3; i++ {
 		// Wait 1s between each receive.
 		time.Sleep(1 * time.Second)
 		receivedMessage := <-messages
