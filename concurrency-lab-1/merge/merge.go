@@ -44,22 +44,23 @@ func mergeSort(slice []int32) {
 }
 
 // TODO: Parallel merge sort.
-func parallelMergeSort(slice []int32, status chan<- bool) {
+func parallelMergeSort(slice []int32, status []chan<- bool) {
 	if len(slice) > 1 {
 
 		middle := len(slice) / 2
 
-		leftDone := make(chan bool)
 		rightDone := make(chan bool)
 
-		go parallelMergeSort(slice[:middle], leftDone)
-		go parallelMergeSort(slice[middle:], rightDone)
+		go parallelMergeSort(slice[:middle], []chan<- bool{rightDone})
+		parallelMergeSort(slice[middle:], []chan<- bool{})
 
-		if (<-leftDone) && (<-rightDone) {
+		if  <-rightDone {
 			merge(slice, middle)
 		}
 	}
-	status <- true
+	if len(status) == 1 {
+		status[0] <- true
+	}
 }
 
 // main starts tracing and in parallel sorts a small slice.
@@ -84,9 +85,6 @@ func main() {
 		slice = append(slice, i)
 	}
 
-	done := make(chan bool)
-	go parallelMergeSort(slice, done)
-	if <-done {
-		fmt.Println(slice)
-	}
+	parallelMergeSort(slice, []chan<- bool{})
+	fmt.Println(slice)
 }
