@@ -4,37 +4,23 @@ package main
 
 func getNeighbours(world [][]byte, row int, column int) []byte {
 	rowAbove, rowBelow, columnLeft, columnRight := 0, 0, 0, 0
+	rowAbove = row - 1
+	rowBelow = row + 1
 	if row == 0 {
 		rowAbove = len(world[0]) - 1
-		rowBelow = row + 1
 	} else if row == len(world[0]) - 1 {
-		rowAbove = row - 1
 		rowBelow = 0
-	} else {
-		rowAbove = row - 1
-		rowBelow = row + 1
 	}
+	columnLeft = column - 1
+	columnRight = column + 1
 	if column == 0 {
 		columnLeft = len(world[0]) - 1
-		columnRight = column + 1
 	} else if column == len(world[0]) - 1 {
-		columnLeft = column - 1
 		columnRight = 0
-	} else {
-		columnLeft = column - 1
-		columnRight = column + 1
 	}
-
-	neighbours := []byte{}
-	neighbours = append(neighbours, world[rowAbove][columnLeft])
-	neighbours = append(neighbours, world[rowAbove][column])
-	neighbours = append(neighbours, world[rowAbove][columnRight])
-	neighbours = append(neighbours, world[row][columnLeft])
-	neighbours = append(neighbours, world[row][columnRight])
-	neighbours = append(neighbours, world[rowBelow][columnLeft])
-	neighbours = append(neighbours, world[rowBelow][column])
-	neighbours = append(neighbours, world[rowBelow][columnRight])
-
+	neighbours := []byte{world[rowAbove][columnLeft], world[rowAbove][column], world[rowAbove][columnRight],
+		world[row][columnLeft], world[row][columnRight], world[rowBelow][columnLeft], world[rowBelow][column],
+		world[rowBelow][columnRight]}
 	return neighbours
 }
 
