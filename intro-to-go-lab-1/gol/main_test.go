@@ -63,10 +63,9 @@ func TestGol(t *testing.T) {
 		}},
 	}
 
-	initial16x16World := readPgmImage(golParams{turns: 0, imageWidth: 16, imageHeight: 16}, "images/16x16.pgm")
-
 	// Run normal tests
 	for _, test := range tests {
+		initial16x16World := readPgmImage(golParams{turns: 0, imageWidth: 16, imageHeight: 16}, "images/16x16.pgm")
 		testName := fmt.Sprintf("%dx%dx%d", test.args.p.imageWidth, test.args.p.imageHeight, test.args.p.turns)
 		t.Run(testName, func(t *testing.T) {
 			world := gameOfLife(test.args.p, initial16x16World)
