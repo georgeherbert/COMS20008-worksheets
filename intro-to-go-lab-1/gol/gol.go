@@ -3,16 +3,15 @@ package main
 //import "fmt"
 
 func getNeighbours(world [][]byte, row int, column int) []byte {
-	rowAbove, rowBelow, columnLeft, columnRight := 0, 0, 0, 0
-	rowAbove = row - 1
-	rowBelow = row + 1
+	rowAbove := row - 1
+	rowBelow := row + 1
 	if row == 0 {
 		rowAbove = len(world[0]) - 1
 	} else if row == len(world[0]) - 1 {
 		rowBelow = 0
 	}
-	columnLeft = column - 1
-	columnRight = column + 1
+	columnLeft := column - 1
+	columnRight := column + 1
 	if column == 0 {
 		columnLeft = len(world[0]) - 1
 	} else if column == len(world[0]) - 1 {
