@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"runtime/trace"
@@ -43,8 +44,22 @@ func mergeSort(slice []int32) {
 }
 
 // TODO: Parallel merge sort.
-func parallelMergeSort(slice []int32) {
-	mergeSort(slice)
+func parallelMergeSort(slice []int32, status chan<- bool) {
+	if len(slice) > 1 {
+
+		middle := len(slice) / 2
+
+		leftDone := make(chan bool)
+		rightDone := make(chan bool)
+
+		go parallelMergeSort(slice[:middle], leftDone)
+		go parallelMergeSort(slice[middle:], rightDone)
+
+		if (<-leftDone) && (<-rightDone) {
+			merge(slice, middle)
+		}
+	}
+	status <- true
 }
 
 // main starts tracing and in parallel sorts a small slice.
@@ -69,5 +84,9 @@ func main() {
 		slice = append(slice, i)
 	}
 
-	parallelMergeSort(slice)
+	done := make(chan bool)
+	go parallelMergeSort(slice, done)
+	if <-done {
+		fmt.Println(slice)
+	}
 }
