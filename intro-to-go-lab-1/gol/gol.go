@@ -5,9 +5,9 @@ package main
 func getNeighbours(world [][]byte, row int, column int) []byte {
 	rowAbove, rowBelow, columnLeft, columnRight := 0, 0, 0, 0
 	if row == 0 {
-		rowAbove = 15
+		rowAbove = len(world[0]) - 1
 		rowBelow = row + 1
-	} else if row == 15 {
+	} else if row == len(world[0]) - 1 {
 		rowAbove = row - 1
 		rowBelow = 0
 	} else {
@@ -15,9 +15,9 @@ func getNeighbours(world [][]byte, row int, column int) []byte {
 		rowBelow = row + 1
 	}
 	if column == 0 {
-		columnLeft = 15
+		columnLeft = len(world[0]) - 1
 		columnRight = column + 1
-	} else if column == 15 {
+	} else if column == len(world[0]) - 1 {
 		columnLeft = column - 1
 		columnRight = 0
 	} else {
