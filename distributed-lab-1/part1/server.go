@@ -8,9 +8,11 @@ import (
 
 func handleConnection(conn *net.Conn) {
 	reader := bufio.NewReader(*conn)
-	msg, _ := reader.ReadString('\n')
-	fmt.Printf(msg)
-	fmt.Fprintln(*conn, "OK")
+	for {
+		msg, _ := reader.ReadString('\n')
+		fmt.Printf(msg)
+		fmt.Fprintln(*conn, "OK")
+	}
 
 }
 

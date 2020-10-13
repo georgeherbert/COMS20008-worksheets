@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"net"
+	"os"
 )
 
 func read(conn *net.Conn) {
@@ -14,9 +14,14 @@ func read(conn *net.Conn) {
 }
 
 func main() {
-	msgPtr := flag.String("msg", "No message supplied", "Message to send")
-	flag.Parse()
+	//msgPtr := flag.String("msg", "No message supplied", "Message to send")
+	//flag.Parse()
+	stdin := bufio.NewReader(os.Stdin)
 	conn, _ := net.Dial("tcp", "127.0.0.1:8080")
-	fmt.Fprintln(conn, *msgPtr)
-	read(&conn)
+	for {
+		fmt.Printf("Enter text: ")
+		text, _ := stdin.ReadString('\n')
+		fmt.Fprintf(conn, text)
+		read(&conn)
+	}
 }
