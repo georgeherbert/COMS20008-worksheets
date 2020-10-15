@@ -3,8 +3,9 @@ package main
 import (
 	"bufio"
 	"flag"
-	"net"
 	"fmt"
+	"net"
+	"strconv"
 )
 
 type Message struct {
@@ -12,9 +13,14 @@ type Message struct {
 	message string
 }
 
-func handleError(err error) {
+func handleError(err error, clientid int, msgs chan Message) {
 	// TODO: all
 	// Deal with an error event.
+	fmt.Println(err.Error())
+	// I think this means a user has disconnected
+	if err.Error() == "EOF" {
+		msgs <- Message{-2, strconv.Itoa(clientid)}
+	}
 }
 
 func acceptConns(ln net.Listener, conns chan net.Conn) {
@@ -33,9 +39,14 @@ func handleClient(client net.Conn, clientid int, msgs chan Message) {
 	// Read in new messages as delimited by '\n's
 	// Tidy up each message and add it to the messages channel,
 	// recording which client it came from.
+	msgs <- Message{-1, strconv.Itoa(clientid)}
 	reader := bufio.NewReader(client)
 	for {
-		msg, _ := reader.ReadString('\n')
+		msg, err := reader.ReadString('\n')
+		if err != nil {
+			go handleError(err, clientid, msgs)
+			break
+		}
 		fmt.Printf(msg)
 		msgTidied := Message{clientid, msg}
 		msgs <- msgTidied
@@ -75,8 +86,14 @@ func main() {
 			//TODO Deal with a new message
 			// Send the message to all clients that aren't the sender
 			for id, conn := range clients {
-				if msg.sender != id {
-					fmt.Fprintln(conn, msg.message)
+				if msg.sender == -1 {
+					fmt.Fprintf(conn, "User %s has joined the room\n", msg.message)
+				} else if msg.sender == -2 {
+					fmt.Fprintf(conn, "User %s has disconected\n", msg.message)
+					userIdInteger, _ := strconv.Atoi(msg.message)
+					delete(clients, userIdInteger)
+				} else if msg.sender != id {
+					fmt.Fprintf(conn, "User %d: %s", msg.sender, msg.message)
 				}
 			}
 		}

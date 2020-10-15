@@ -3,10 +3,9 @@ package main
 import (
 	"bufio"
 	"flag"
-	"net"
 	"fmt"
+	"net"
 	"os"
-	"time"
 )
 
 func read(conn *net.Conn) {
@@ -37,6 +36,5 @@ func main() {
 	//TODO Start asynchronously reading and displaying messages
 	go read(&conn)
 	//TODO Start getting and sending user messages.
-	go write(&conn)
-	time.Sleep(time.Second * 100)
+	write(&conn)
 }
