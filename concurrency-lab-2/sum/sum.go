@@ -14,8 +14,8 @@ func main() {
 			sum = sum + 1
 			wg.Done()
 		}()
+		wg.Wait()
 	}
-
 	wg.Wait()
 	fmt.Println(sum)
 }
