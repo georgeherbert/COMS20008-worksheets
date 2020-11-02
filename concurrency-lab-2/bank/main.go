@@ -5,15 +5,31 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
 var debug *bool
 
-// An executor is a type of a worker goroutine that handles the incoming transactions.
-func executor(bank *bank, executorId int, transactionQueue <-chan transaction, done chan<- bool) {
+func manager(bank *bank, transactionQueue chan transaction, processedTransactionQueue chan<- transaction) {
 	for {
 		t := <-transactionQueue
+		if !(bank.getAccountLocked(t.from) || bank.getAccountLocked(t.to)) {
+			bank.lockAccount(t.from, "")
+			fmt.Println("Manager locked account", t.from)
+			bank.lockAccount(t.to, "")
+			fmt.Println("Manager locked account", t.to)
+			processedTransactionQueue <- t
+		} else {
+			transactionQueue <- t
+		}
+	}
+}
+
+// An executor is a type of a worker goroutine that handles the incoming transactions.
+func executor(bank *bank, executorId int, processedTransactionQueue <-chan transaction, done chan<- bool) {
+	for {
+		t := <-processedTransactionQueue
 
 		from := bank.getAccountName(t.from)
 		to := bank.getAccountName(t.to)
@@ -21,17 +37,12 @@ func executor(bank *bank, executorId int, transactionQueue <-chan transaction, d
 		fmt.Println("Executor\t", executorId, "attempting transaction from", from, "to", to)
 		e := bank.addInProgress(t, executorId) // Removing this line will break visualisations.
 
-		// bank.lockAccount(t.from, strconv.Itoa(executorId))
-		// fmt.Println("Executor\t", executorId, "locked account", from)
-		// bank.lockAccount(t.to, strconv.Itoa(executorId))
-		// fmt.Println("Executor\t", executorId, "locked account", to)
-
 		bank.execute(t, executorId)
 
-		// bank.unlockAccount(t.from, strconv.Itoa(executorId))
-		// fmt.Println("Executor\t", executorId, "unlocked account", from)
-		// bank.unlockAccount(t.to, strconv.Itoa(executorId))
-		// fmt.Println("Executor\t", executorId, "unlocked account", to)
+		bank.unlockAccount(t.from, strconv.Itoa(executorId))
+		fmt.Println("Executor\t", executorId, "unlocked account", from)
+		bank.unlockAccount(t.to, strconv.Itoa(executorId))
+		fmt.Println("Executor\t", executorId, "unlocked account", to)
 
 		bank.removeCompleted(e, executorId) // Removing this line will break visualisations.
 		done <- true
@@ -65,6 +76,8 @@ func main() {
 	startSum := bank.sum()
 
 	transactionQueue := make(chan transaction, transactions)
+	processedTransactionQueue := make(chan transaction, transactions)
+
 	expectedMoneyTransferred := 0
 	for i := 0; i < transactions; i++ {
 		t := bank.getTransaction()
@@ -74,8 +87,9 @@ func main() {
 
 	done := make(chan bool)
 
+	go manager(&bank, transactionQueue, processedTransactionQueue)
 	for i := 0; i < bankSize; i++ {
-		go executor(&bank, i, transactionQueue, done)
+		go executor(&bank, i, processedTransactionQueue, done)
 	}
 
 	for total := 0; total < transactions; total++ {
