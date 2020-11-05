@@ -8,12 +8,18 @@ void *hello_world(void *args) {
 }
 
 int main(int argc, char const *argv[]) {
-    pthread_t thread;
-    int n = 1;
-    if (pthread_create(&thread, NULL, hello_world, &n)) {
-        printf("Error creating thread\n");
+    pthread_t thread[5];
+    int threadNum[5] = {1, 2, 3, 4, 5};
+
+    for (int i = 0; i < 5; i++) {
+        if (pthread_create(&thread[i], NULL, hello_world, &threadNum[i])) {
+            printf("Error creating thread\n");
+        }
     }
-    if (pthread_join(thread, NULL)) {
-        printf("Error joining thread\n");
+
+    for (int i = 0; i < 5; i++) {
+        if (pthread_join(thread[i], NULL)) {
+            printf("Error joining thread\n");
+        }
     }
 }
